@@ -186,6 +186,8 @@ class UI {
     }
 
     static sendToSpotify(n, a) {
+        n = n.replaceAll("&", "");
+        a = a.replaceAll("&", "");
         Spotify.sendToSpotify(n, a);
     }
 }
