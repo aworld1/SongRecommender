@@ -163,7 +163,7 @@ class UI {
             let n = songs[i]["name"].replaceAll(`"`, "").replaceAll(`'`, "").replaceAll(`(`, "").replaceAll(`)`, "");
             let a = songs[i]["artist"].replaceAll(`"`, "").replaceAll(`'`, "").replaceAll(`(`, "").replaceAll(`)`, "");
             modalHtml += `<b>${songs[i]["name"]}</b> by ${songs[i]["artist"]}<a href="#"><div class="yt-icon" onclick="UI.redirect('https://www.youtube.com/results?search_query=${n}+by+${a}')"></div></a>
-            <div class="sp-icon" onclick="Spotify.sendToSpotify('${n}', '${a}')"></div></a><br/>`
+            <div class="sp-icon" onclick="UI.sendToSpotify('${n}', '${a}')"></div></a><br/>`
         }
         Swal.fire({
             title: 'Recommended Songs',
@@ -183,6 +183,10 @@ class UI {
     static prepLandingPage() {
         setTimeout(UI.bindButtons, 100);
         UI.startWaveIntervals();
+    }
+
+    static sendToSpotify(n, a) {
+        Spotify.sendToSpotify(n, a);
     }
 }
 

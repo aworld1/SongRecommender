@@ -82,7 +82,7 @@ class Spotify {
                 return {error: data};
             }
         });
-        let link = links["tracks"]["items"][0]["preview_url"];
+        let link = links["tracks"]["items"][0]["external_urls"]["spotify"];
         window.open(link);
     }
 }
