@@ -106,10 +106,10 @@ class UI {
         let playlists = [];
         let ids = [];
         for (let i = 0; i < data["items"].length; i++) {
-            if (data["items"][i]["owner"]["display_name"] == Server.currentUserProfile["display_name"]) {
-                playlists.push(data["items"][i]["name"]);
-                ids.push(data["items"][i]["id"]);
-            }
+            //if (data["items"][i]["owner"]["display_name"] == Server.currentUserProfile["display_name"]) {
+            playlists.push(data["items"][i]["name"]);
+            ids.push(data["items"][i]["id"]);
+            //}
         }
         UI.chooseTrackDialog(playlists, ids);
     }
@@ -131,18 +131,28 @@ class UI {
             inputPlaceholder: 'Select a playlist',
             confirmButtonText: 'Find Songs',
             confirmButtonColor: "#13ab4c",
+            showLoaderOnConfirm: true,
             preConfirm: async (index) => {
                 if (!index) return {error: "NO PLAYLIST"};
                 let trackData = await Spotify.getTracksInPlaylist(ids[index]);
                 let tracks = [];
+                let trackNames = new Set();
                 for (let t in trackData["items"]) {
                     let track = trackData["items"][t]["track"];
                     tracks.push({
                         "artist_name": track["artists"][0]["name"],
                         "track_name": track["name"]
                     });
+                    trackNames.add(track["name"]);
                 }
-                return UI.showResultingSongs((await Spotify.getRecommendations(tracks))["data"]);
+                let results = (await Spotify.getRecommendations(tracks))["data"];
+                let filterByExist = [];
+                for (let song in results) {
+                    if (!trackNames.has(results[song]["name"])) {
+                        filterByExist.push(results[song]);
+                    }
+                }
+                return UI.showResultingSongs(filterByExist);
             },
         });
     }
@@ -150,8 +160,10 @@ class UI {
     static showResultingSongs(songs) {
         let modalHtml = "";
         for (let i in songs) {
-            modalHtml += `<b>${songs[i]["name"]}</b> by ${songs[i]["artist"]}<a href="#"><div class="yt-icon" onclick="UI.redirect('https://www.youtube.com/results?search_query=${songs[i]["name"]}+by+${songs[i]["artist"]}')"></div></a>
-            <div class="sp-icon" onclick="Spotify.sendToSpotify('${songs[i]["name"]}', '${songs[i]["artist"]}')"></div></a><br/>`
+            let n = songs[i]["name"].replaceAll(`"`, "").replaceAll(`'`, "").replaceAll(`(`, "").replaceAll(`)`, "");
+            let a = songs[i]["artist"].replaceAll(`"`, "").replaceAll(`'`, "").replaceAll(`(`, "").replaceAll(`)`, "");
+            modalHtml += `<b>${songs[i]["name"]}</b> by ${songs[i]["artist"]}<a href="#"><div class="yt-icon" onclick="UI.redirect('https://www.youtube.com/results?search_query=${n}+by+${a}')"></div></a>
+            <div class="sp-icon" onclick="Spotify.sendToSpotify('${n}', '${a}')"></div></a><br/>`
         }
         Swal.fire({
             title: 'Recommended Songs',
