@@ -160,10 +160,11 @@ class UI {
     static showResultingSongs(songs) {
         let modalHtml = "";
         for (let i in songs) {
-            let n = songs[i]["name"].replaceAll(`"`, "").replaceAll(`'`, "").replaceAll(`(`, "").replaceAll(`)`, "");
-            let a = songs[i]["artist"].replaceAll(`"`, "").replaceAll(`'`, "").replaceAll(`(`, "").replaceAll(`)`, "");
-            modalHtml += `<b>${songs[i]["name"]}</b> by ${songs[i]["artist"]}<a href="#"><div class="yt-icon" onclick="UI.redirect('https://www.youtube.com/results?search_query=${n}+by+${a}')"></div></a>
+            let n = songs[i]["name"].replaceAll(`"`, "%22").replaceAll(`'`, "").replaceAll(`(`, "").replaceAll(`)`, "").replaceAll("&", "%26");
+            let a = songs[i]["artist"].replaceAll(`"`, "%22").replaceAll(`'`, "").replaceAll(`(`, "").replaceAll(`)`, "").replaceAll("&", "%26");
+            modalHtml += `<b>${songs[i]["name"]}</b> by ${songs[i]["artist"]}<a href="#"></a>
             <div class="sp-icon" onclick="UI.sendToSpotify('${n}', '${a}')"></div></a><br/>`
+            // Prohibited to use YT by Spotify: <div class="yt-icon" onclick="UI.redirect('https://www.youtube.com/results?search_query=${n}+by+${a}')"></div>
         }
         Swal.fire({
             title: 'Recommended Songs',
@@ -186,8 +187,6 @@ class UI {
     }
 
     static sendToSpotify(n, a) {
-        n = n.replaceAll("&", "");
-        a = a.replaceAll("&", "");
         Spotify.sendToSpotify(n, a);
     }
 }
